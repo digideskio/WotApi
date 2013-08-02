@@ -7,7 +7,9 @@ class wotapi{
 	}
 	
 	function player_info($id, $region='RU'){
-	
+		$search_str = "http://api.worldoftanks.$region/community/accounts/$id/api/1.9/?source_token=WG-WoT_Assistant-1.3.2";
+		$search_data = json_decode(file_get_contents ($search_str));
+		return $search_data->data;
 	
 	}
 	
