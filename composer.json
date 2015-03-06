@@ -1,0 +1,20 @@
+{
+    "name": "akeinhell/wot-api",
+    "description": "Class for easy access Wargaming.net (World of tanks and other) Rest API Services",
+    "require": {
+        "nategood/httpful": "*"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Aleksey Dorokhov",
+            "email": "akeinhell@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "WotApi": "src/"
+        }
+    }
+    "minimum-stability": "dev"
+}
