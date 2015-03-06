@@ -115,7 +115,6 @@ class Api
 
         if (getenv('APPLICATION_PROXY'))
         {
-            var_dump(('APPLICATION_PROXY'));
             $response = Request::get($url)
                 ->followRedirects()
                 ->addOnCurlOption(CURLOPT_PROXY, '192.168.11.247')
@@ -124,7 +123,6 @@ class Api
                 ->send();
         }
         else{
-            var_dump(('NOT APPLICATION_PROXY'));
             $response = Request::get($url)
                 ->followRedirects()
                 ->send();
