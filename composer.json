@@ -4,6 +4,9 @@
     "require": {
         "nategood/httpful": "*"
     },
+    "require-dev": {
+        "phpunit/phpunit": "*"
+    },
     "license": "MIT",
     "authors": [
         {
