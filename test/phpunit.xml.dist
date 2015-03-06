@@ -21,4 +21,7 @@
     </logging>
     <server name="REQUEST_SCHEME" value="http" />
     <server name="HTTP_HOST" value="test" />
+    <env name="PROX" value="test" />
+    <env name="APPLICATION_PROXY" value="true" />
+    <server name="APPLICATION_PROXY" value="true" />
 </phpunit>

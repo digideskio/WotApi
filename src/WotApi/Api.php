@@ -112,13 +112,23 @@ class Api
             return self::create();
         };
         $url = self::createUrl($name, $arguments);
-        $response = Request::get($url)
-            ->followRedirects()
-            ->useProxy('192.168.11.247', 3128, CURLPROXY_HTTP, 'alex_d', 'Ag7217100')
-            ->send();
-        print($response->body);
-        die;
-        $data = Application::get($url);
+
+        if (getenv('APPLICATION_PROXY'))
+        {
+            $response = Request::get($url)
+                ->followRedirects()
+                ->addOnCurlOption(CURLOPT_PROXY, '192.168.11.247')
+                ->addOnCurlOption(CURLOPT_PROXYPORT, 3128)
+                ->addOnCurlOption(CURLOPT_PROXYUSERPWD, 'alex_d:Ag7217100')
+                ->send();
+        }
+        else{
+            $response = Request::get($url)
+                ->followRedirects()
+                ->send();
+        }
+
+        $data = $response->body;
         return $data->status == 'ok' ? $data->data : null;
     }
 

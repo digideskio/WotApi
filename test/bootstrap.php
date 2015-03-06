@@ -1,6 +1,7 @@
 <?php
 putenv('HTTP_HOST=vm');
 putenv('application_id=demo');
+putenv('APPLICATION_PROXY=true');
 
 
 error_reporting(E_ALL);
