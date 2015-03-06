@@ -7,7 +7,15 @@
 
 namespace WotApi;
 
-
+/**
+ * Description of Api
+ *
+ * @author akeinhell
+ * @method string setAppid(string $application_id)
+ * @method string setToken(string $token)
+ * @method string setRegion(string $region)
+ * @method \WotApi\Api wot
+ */
 class Api
 {
 
@@ -126,8 +134,9 @@ class Api
     {
         $redirect_to = empty($redirect_to) ? Application::getBaseURL() : $redirect_to;
         self::setProject('wot');
-        $url = self::$instance->auth->login(array('nofollow'=>1, 'redirect_uri'=>$redirect_to));
-        $url = $url ? $url->location :false;
+        $url = self::$instance->auth->login(array('nofollow' => 1, 'redirect_uri' => $redirect_to));
+        $url = $url ? $url->location : false;
+
         return $url;
     }
 
@@ -148,6 +157,7 @@ class Api
     public static function __callStatic($name, $arguments)
     {
         self::$Project = $name;
+
         return self::create();
     }
 
