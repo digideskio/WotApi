@@ -12,9 +12,9 @@ use WotApi\Api;
 
 class ApiTest extends \PHPUnit_Framework_TestCase {
 
-    function authTest()
+    function testAuth()
     {
-        Api::wot();
+        $this->assertNotNull(Api::wot()->genAuthUrl());
     }
 }
  

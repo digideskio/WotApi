@@ -18,6 +18,5 @@
         "psr-0": {
             "WotApi": "src/"
         }
-    },
-    "minimum-stability": "dev"
+    }
 }

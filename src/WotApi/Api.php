@@ -7,6 +7,8 @@
 
 namespace WotApi;
 
+use Httpful\Request;
+
 /**
  * Description of Api
  *
@@ -14,7 +16,8 @@ namespace WotApi;
  * @method string setAppid(string $application_id)
  * @method string setToken(string $token)
  * @method string setRegion(string $region)
- * @method \WotApi\Api wot
+ * @method string setProject(string $project)
+ * @method static \WotApi\Api wot()
  */
 class Api
 {
@@ -59,7 +62,6 @@ class Api
     {
         if (is_null(self::$instance)) {
             self::$instance = new self();
-            Application::init();
         }
 
         return self::$instance;
@@ -110,16 +112,13 @@ class Api
             return self::create();
         };
         $url = self::createUrl($name, $arguments);
+        $response = Request::get($url)
+            ->followRedirects()
+            ->useProxy('192.168.11.247', 3128, CURLPROXY_HTTP, 'alex_d', 'Ag7217100')
+            ->send();
+        print($response->body);
+        die;
         $data = Application::get($url);
-        Log::api()->info('Api_request: ', array('url' => $url, 'args' => $arguments));
-        if ($data->status != 'ok') {
-            Log::api()->addError('Error', array(
-                'url'      => $url,
-                'args'     => $arguments,
-                'response' => $data
-            ));
-        }
-
         return $data->status == 'ok' ? $data->data : null;
     }
 
@@ -132,7 +131,7 @@ class Api
      */
     public function genAuthUrl($redirect_to = '')
     {
-        $redirect_to = empty($redirect_to) ? Application::getBaseURL() : $redirect_to;
+        $redirect_to = empty($redirect_to) ? '' : $redirect_to;
         self::setProject('wot');
         $url = self::$instance->auth->login(array('nofollow' => 1, 'redirect_uri' => $redirect_to));
         $url = $url ? $url->location : false;
