@@ -123,13 +123,13 @@ class Api
         };
         $url = self::createUrl($name, $arguments);
 
-        if (getenv('APPLICATION_PROXY'))
+        if (getenv('PROXY'))
         {
             $response = Request::get($url)
                 ->followRedirects()
-                ->addOnCurlOption(CURLOPT_PROXY, '192.168.11.247')
-                ->addOnCurlOption(CURLOPT_PROXYPORT, 3128)
-                ->addOnCurlOption(CURLOPT_PROXYUSERPWD, 'alex_d:Ag7217100')
+                ->addOnCurlOption(CURLOPT_PROXY, getenv('PROXY_URL'))
+                ->addOnCurlOption(CURLOPT_PROXYPORT, getenv('PROXY_PORT'))
+                ->addOnCurlOption(CURLOPT_PROXYUSERPWD, getenv('PROXY_USER'))
                 ->send();
         }
         else{
