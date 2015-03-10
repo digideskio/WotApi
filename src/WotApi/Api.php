@@ -32,7 +32,10 @@ class Api
      */
     public static $Appid = '';
 
-    public static $Project = 'wot';
+    /**
+     * @var string
+     */
+    protected static $Project = 'wot';
     /**
      * @var string Регион по умолчанию
      */
@@ -52,6 +55,13 @@ class Api
      * @var string|null токен пользователя
      */
     public static $token = null;
+
+    /**
+     * @var \Closure
+     */
+    private static $successCallback ;
+    private static $errorCallback ;
+    private static $sendCallback ;
 
 
     /**
@@ -127,9 +137,20 @@ class Api
                 ->followRedirects()
                 ->send();
         }
+        self::runCallback(self::$sendCallback);
 
         $data = $response->body;
-        return $data->status == 'ok' ? $data->data : null;
+
+        if (isset($data->status) && $data->status == 'ok')
+        {
+            self::runCallback(self::$successCallback);
+            return $data->data;
+        }
+        else
+        {
+            self::runCallback(self::$errorCallback);
+            return null;
+        }
     }
 
     /**
@@ -170,5 +191,23 @@ class Api
         return self::create();
     }
 
+    public  static function onSuccess(\Closure $func)
+    {
+       self::$successCallback =  $func;
+    }
 
+    public  static function onSend(\Closure $func)
+    {
+        self::$sendCallback =  $func;
+    }
+
+    public  static function onError(\Closure $func)
+    {
+        self::$errorCallback =  $func;
+    }
+
+    private static function runCallback($callback)
+    {
+        if ($callback instanceof \Closure) $callback();
+    }
 }
