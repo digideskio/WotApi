@@ -17,13 +17,14 @@ Api::wot()->encyclopedia->tanks()
 ```
 
 Разбор
-Api - Название класса
 
-Статические методы : 
+- Api - Название класса
+
+- Статические методы : 
  1. wot() - доступ к данным [World of tanks](https://ru.wargaming.net/developers/api_reference/wot/account/list/) 
  2. wgn() - доступ к данным [Wargaming.NET](https://ru.wargaming.net/developers/api_reference/wgn/clans/list/) 
 
- encyclopedia->tanks() доступ к списку техники через метод [encyclopedia/tanks](https://ru.wargaming.net/developers/api_reference/wot/encyclopedia/tanks/) 
+- (метод API) encyclopedia->tanks() доступ к списку техники через метод [encyclopedia/tanks](https://ru.wargaming.net/developers/api_reference/wot/encyclopedia/tanks/) 
  
  
  ## Примеры ##
