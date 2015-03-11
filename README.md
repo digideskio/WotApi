@@ -49,6 +49,6 @@ Api::wot()->account->info(array('account_id'=>666))
 ## Принять участие в разработке ##
 
 Вы можете принять участие в разработке следующим образом:
-- Сообщать о возникших ошибках в (Багтрекер)[https://github.com/akeinhell/WotApi/issues]
-- Высказать предложения о доработке в (Багтрекер)[https://github.com/akeinhell/WotApi/issues] с пометкой "Предложение"
+- Сообщать о возникших ошибках в [Багтрекер](https://github.com/akeinhell/WotApi/issues)
+- Высказать предложения о доработке в [Багтрекер](https://github.com/akeinhell/WotApi/issues) с пометкой "Предложение"
 - Или присылайте свои Pull Request. Каждый из них будет обязательно рассмотрен.
