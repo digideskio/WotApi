@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>PHP Wargaming Api by akeinhell</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/akeinhell/WotApi">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/akeinhell/WotApi/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/akeinhell/WotApi/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>PHP Wargaming Api</h1>
+          <p>Class for easy access Wargaming.net  Rest API Services</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/akeinhell">akeinhell</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>
+<a id="wotapi" class="anchor" href="#wotapi" aria-hidden="true"><span class="octicon octicon-link"></span></a>WoTApi</h1>
+
+<p>PHP класс для удобной работы с Wargaming Api </p>
+
+<h2>
+<a id="Установка" class="anchor" href="#%D0%A3%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0" aria-hidden="true"><span class="octicon octicon-link"></span></a>Установка</h2>
+
+<p>Через Composer </p>
+
+<pre><code>composer require "akeinhell/wot-api" "dev-master"
+</code></pre>
+
+<h2>
+<a id="Примеры-использования" class="anchor" href="#%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80%D1%8B-%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F" aria-hidden="true"><span class="octicon octicon-link"></span></a>Примеры использования</h2>
+
+<pre><code>
+Api::setAppid('YOUR_APPLICATION_ID'); // Перед работой с классом укажите свой application_id, получить его можно [тут](https://ru.wargaming.net/developers/applications/)
+Api::setToken('USER_AUTH_TOKEN'); // Перед работой с персональными данными игрока необходимо указать его токен полученный после авторизации [подробнее](https://ru.wargaming.net/support/Knowledgebase/Article/View/800/25/autentifikcija-pri-pomoshhi-metodov-public-api)
+Api::getAuthUrl(); // возвращает ссылку для авторизации пользователя
+$params = array()
+Api::wot()-&gt;encyclopedia-&gt;tanks(); // Получает список техники
+Api::wgn()-&gt;clans-&gt;list();//осуществляет поиск по кланам и сортирует их в указанном порядке
+
+</code></pre>
+
+<p>Разбор</p>
+
+<ul>
+<li><p>Api - Название класса</p></li>
+<li>
+<p>Статические методы : </p>
+
+<ol>
+<li>wot() - доступ к данным <a href="https://ru.wargaming.net/developers/api_reference/wot/account/list/">World of tanks</a> </li>
+<li>wgn() - доступ к данным <a href="https://ru.wargaming.net/developers/api_reference/wgn/clans/list/">Wargaming.NET</a> </li>
+</ol>
+</li>
+<li>
+<p>(метод API) encyclopedia-&gt;tanks() доступ к списку техники через метод <a href="https://ru.wargaming.net/developers/api_reference/wot/encyclopedia/tanks/">encyclopedia/tanks</a> </p>
+
+<h2>
+<a id="Примеры" class="anchor" href="#%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80%D1%8B" aria-hidden="true"><span class="octicon octicon-link"></span></a>Примеры</h2>
+</li>
+</ul>
+
+<pre><code>// Возвращает список техники в игре
+Api::wot()-&gt;encyclopedia-&gt;tanks()
+
+// Возвращает ссылку для авторизации пользователя через OpenID
+Api::genAuthUrl()
+
+// Метод возвращает информацию об игроке c ID=666
+Api::wot()-&gt;account-&gt;list(array('account_id'=&gt;666))
+</code></pre>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-33291919-3");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
