@@ -43,5 +43,12 @@ Api::wot()->encyclopedia->tanks()
 Api::genAuthUrl()
 
 // Метод возвращает информацию об игроке c ID=666
-Api::wot()->account->list(array('account_id'=>666))
+Api::wot()->account->info(array('account_id'=>666))
 ```
+
+## Принять участие в разработке ##
+
+Вы можете принять участие в разработке следующим образом:
+- Сообщать о возникших ошибках в (Багтрекер)[https://github.com/akeinhell/WotApi/issues]
+- Высказать предложения о доработке в (Багтрекер)[https://github.com/akeinhell/WotApi/issues] с пометкой "Предложение"
+- Или присылайте свои Pull Request. Каждый из них будет обязательно рассмотрен.
