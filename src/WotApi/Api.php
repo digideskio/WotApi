@@ -25,7 +25,7 @@ class Api
     /**
      * @var string базовый URL API
      */
-    public static $URL = 'http://api.worldoftanks.{region}/{project}/';
+    private static $URL = 'http://api.worldoftanks.%s/%s/';
 
     /**
      * @var string application_id приложения
@@ -96,8 +96,7 @@ class Api
             $args = array_merge($args, array('access_token' => self::$token));
         }
 
-        $url = str_replace('{region}', self::$Region, self::$URL) . $api . '?' . http_build_query($args);
-        $url = str_replace('{project}', self::$Project, $url);
+        $url = sprintf(self::$URL, self::$Region, self::$Project). $api . '?' . http_build_query($args);
 
         return $url;
     }
