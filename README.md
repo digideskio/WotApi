@@ -46,6 +46,27 @@ Api::genAuthUrl()
 Api::wot()->account->info(array('account_id'=>666))
 ```
 
+
+## Отслеживание событий ##
+```
+        // Вызывается при ошибке API
+        Api::onError(function(){
+                print 'onError trigger'.PHP_EOL;
+            }
+        );
+        // Вызывается при успешном получении данных 
+        Api::onSuccess(
+            function(){print 'onSuccess trigger'.PHP_EOL;}
+        );
+        // вызывается при каждом запросе к API
+        Api::onSend(
+            function(){
+                print 'onSend trigger'.PHP_EOL;
+            }
+        );
+```
+
+
 ## Принять участие в разработке ##
 
 Вы можете принять участие в разработке следующим образом:

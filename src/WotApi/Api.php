@@ -205,8 +205,12 @@ class Api
         self::$errorCallback =  $func;
     }
 
-    private static function runCallback($callback)
+    /**
+     * @param \Closure $callback
+     * @param null $params
+     */
+    private static function runCallback($callback, $params=null)
     {
-        if ($callback instanceof \Closure) $callback();
+        if ($callback instanceof \Closure) call_user_func($callback, $params);
     }
 }
