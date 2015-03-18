@@ -10,4 +10,4 @@ require_once './vendor/autoload.php';
 
 if (file_exists(DIR.'.env')) Dotenv::load(__DIR__);
 
-\WotApi\Api::create()->setAppid('demo');
+\WotApi\Api::create()->setApplicationId('demo');

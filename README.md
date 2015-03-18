@@ -13,7 +13,7 @@ composer require "akeinhell/wot-api" "dev-master"
 ## Примеры использования ##
 ```
 
-Api::setAppid('YOUR_APPLICATION_ID'); // Перед работой с классом укажите свой application_id, получить его можно [тут](https://ru.wargaming.net/developers/applications/)
+Api::setApplicationId('YOUR_APPLICATION_ID'); // Перед работой с классом укажите свой application_id, получить его можно [тут](https://ru.wargaming.net/developers/applications/)
 Api::setToken('USER_AUTH_TOKEN'); // Перед работой с персональными данными игрока необходимо указать его токен полученный после авторизации [подробнее](https://ru.wargaming.net/support/Knowledgebase/Article/View/800/25/autentifikcija-pri-pomoshhi-metodov-public-api)
 Api::getAuthUrl(); // возвращает ссылку для авторизации пользователя
 $params = array()

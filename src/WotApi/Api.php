@@ -14,8 +14,6 @@ use Httpful\Request;
  *
  * @author akeinhell
  * @method string setAppid(string $application_id)
- * @method string setToken(string $token)
- * @method string setRegion(string $region)
  * @method string setProject(string $project)
  * @method static \WotApi\Api wot()
  */
@@ -40,6 +38,30 @@ class Api
      * @var string Регион по умолчанию
      */
     public static $Region = 'ru';
+
+    /**
+     * @param string $Region
+     */
+    public static function setRegion($Region)
+    {
+        self::$Region = $Region;
+    }
+
+    /**
+     * @param string $Appid
+     */
+    public static function setApplicationId($Appid)
+    {
+        self::$Appid = $Appid;
+    }
+
+    /**
+     * @param null|string $token
+     */
+    public static function setToken($token)
+    {
+        self::$token = $token;
+    }
 
     /**
      * @var \WotApi\Api|null Экземпляр обьекта
@@ -111,15 +133,8 @@ class Api
      */
     public function __call($name, $arguments = array())
     {
-        if (preg_match('/^set(.*)/', $name, $var)) {
-            if (is_array($arguments) && sizeof($arguments) == 1) {
-                self::${$var[1]} = $arguments[0];
-            } else {
-                self::${$var[1]} = $arguments;
-            }
-
-            return self::create();
-        };
+        var_dump($name);
+        var_dump($arguments);
         $url = self::createUrl($name, $arguments);
 
         if (getenv('PROXY'))
