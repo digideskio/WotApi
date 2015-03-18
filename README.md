@@ -50,17 +50,23 @@ Api::wot()->account->info(array('account_id'=>666))
 ## Отслеживание событий ##
 ```
         // Вызывается при ошибке API
-        Api::onError(function(){
-                print 'onError trigger'.PHP_EOL;
+        // @var $error stdClass|null 
+        Api::onError(function($error){
+                var_dump($error); 
             }
         );
         // Вызывается при успешном получении данных 
         Api::onSuccess(
-            function(){print 'onSuccess trigger'.PHP_EOL;}
+            //@var $response stdClass ответ API
+            function($response){}
         );
         // вызывается при каждом запросе к API
         Api::onSend(
-            function(){
+            /**
+            * @var $url string Запрошенный url
+            * @var $params array Переданные параметры
+            */
+            function($url, $params){
                 print 'onSend trigger'.PHP_EOL;
             }
         );

@@ -133,8 +133,6 @@ class Api
      */
     public function __call($name, $arguments = array())
     {
-        var_dump($name);
-        var_dump($arguments);
         $url = self::createUrl($name, $arguments);
 
         if (getenv('PROXY'))
@@ -151,18 +149,19 @@ class Api
                 ->followRedirects()
                 ->send();
         }
-        self::runCallback(self::$sendCallback);
+        list($requestUrl, $requestParams) = explode('?', $url);
+        self::call(self::$sendCallback, $requestUrl, $arguments);
 
         $data = $response->body;
 
         if (isset($data->status) && $data->status == 'ok')
         {
-            self::runCallback(self::$successCallback);
+            self::call(self::$successCallback, $data->data);
             return $data->data;
         }
         else
         {
-            self::runCallback(self::$errorCallback);
+            self::call(self::$errorCallback, isset($data->error)?$data->error:null);
             return null;
         }
     }
@@ -221,11 +220,13 @@ class Api
     }
 
     /**
-     * @param \Closure $callback
-     * @param null $params
      */
-    private static function runCallback($callback, $params=null)
+    private static function call()
     {
-        if ($callback instanceof \Closure) call_user_func($callback, $params);
+        $args = func_get_args();
+        $function = array_shift($args);
+        if (is_callable($function)) {
+            call_user_func_array($function, $args);
+        }
     }
 }
