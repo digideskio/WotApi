@@ -199,7 +199,22 @@ class Api
 
     public static function __callStatic($name, $arguments)
     {
-        self::$Project = $name;
+        switch(strtolower($name))
+        {
+            case 'blitz':
+            case 'wotb':
+                self::$URL = 'http://api.wotblitz.%s/%s/';
+                self::setProject('wotb');
+                break;
+            case 'wowp':
+            case 'wow':
+                self::$URL = 'http://api.worldofwarplanes.%s/%s/';
+                self::setProject('wowp');
+                break;
+            default:
+                self::$URL = 'http://api.worldoftanks.%s/%s/';
+                self::setProject(strtolower($name));
+        }
 
         return self::create();
     }

@@ -20,6 +20,11 @@ $params = array()
 Api::wot()->encyclopedia->tanks(); // Получает список техники
 Api::wgn()->clans->list();//осуществляет поиск по кланам и сортирует их в указанном порядке
 
+Api::wow()->.... // Доступ к API World of warplanes
+Api::wowp()->.... // Доступ к API World of warplanes
+
+Api::blitz()->.... // Доступ к API World of tanks Blitz
+Api::wotb()->.... // Доступ к API World of tanks Blitz
 ```
 
 Разбор
