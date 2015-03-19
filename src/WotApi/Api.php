@@ -40,6 +40,15 @@ class Api
     public static $Region = 'ru';
 
     /**
+     * @param string $Project
+     */
+    public static function setProject($Project)
+    {
+        self::$Project = $Project;
+    }
+
+    
+    /**
      * @param string $Region
      */
     public static function setRegion($Region)
