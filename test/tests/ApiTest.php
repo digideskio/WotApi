@@ -31,6 +31,7 @@ class ApiTest extends \PHPUnit_Framework_TestCase {
         );
         $this->assertNull(Api::wot()->qwe->qwe());
         $this->assertNotNull(Api::wot()->encyclopedia->tanks());
+        $this->assertNotNull(Api::wot()->genAuthUrl());
     }
 }
  

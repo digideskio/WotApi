@@ -13,9 +13,8 @@ use Httpful\Request;
  * Description of Api
  *
  * @author akeinhell
- * @method string setAppid(string $application_id)
- * @method string setProject(string $project)
  * @method static \WotApi\Api wot()
+ * @method static \WotApi\Api wgn()
  */
 class Api
 {
@@ -40,6 +39,14 @@ class Api
     public static $Region = 'ru';
 
     /**
+     * @param string $Url
+     */
+    public static function setURL($URL)
+    {
+        self::$URL = $URL;
+    }
+
+    /**
      * @param string $Project
      */
     public static function setProject($Project)
@@ -47,7 +54,7 @@ class Api
         self::$Project = $Project;
     }
 
-    
+
     /**
      * @param string $Region
      */
@@ -158,7 +165,7 @@ class Api
                 ->followRedirects()
                 ->send();
         }
-        list($requestUrl, $requestParams) = explode('?', $url);
+        list($requestUrl) = explode('?', $url);
         self::call(self::$sendCallback, $requestUrl, $arguments);
 
         $data = $response->body;
@@ -185,7 +192,6 @@ class Api
     public function genAuthUrl($redirect_to = '')
     {
         $redirect_to = empty($redirect_to) ? '' : $redirect_to;
-        self::setProject('wot');
         $url = self::$instance->auth->login(array('nofollow' => 1, 'redirect_uri' => $redirect_to));
         $url = $url ? $url->location : false;
 
@@ -212,16 +218,16 @@ class Api
         {
             case 'blitz':
             case 'wotb':
-                self::$URL = 'http://api.wotblitz.%s/%s/';
+                self::setURL('http://api.wotblitz.%s/%s/');
                 self::setProject('wotb');
                 break;
             case 'wowp':
             case 'wow':
-                self::$URL = 'http://api.worldofwarplanes.%s/%s/';
+                self::setURL('http://api.worldofwarplanes.%s/%s/');
                 self::setProject('wowp');
                 break;
             default:
-                self::$URL = 'http://api.worldoftanks.%s/%s/';
+                self::setURL('http://api.worldoftanks.%s/%s/');
                 self::setProject(strtolower($name));
         }
 

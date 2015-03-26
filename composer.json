@@ -1,10 +1,9 @@
 {
     "name": "akeinhell/wot-api",
     "description": "Class for easy access Wargaming.net (World of tanks and other) Rest API Services",
-    "version": "0.1.0",
     "minimum-stability": "dev",
     "require": {
-        "nategood/httpful": "*",
+        "nategood/httpful": "dev-master"
         "vlucas/phpdotenv": "1.1.*@dev"
     },
     "require-dev": {
