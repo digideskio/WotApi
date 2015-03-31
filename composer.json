@@ -3,7 +3,7 @@
     "description": "Class for easy access Wargaming.net (World of tanks and other) Rest API Services",
     "minimum-stability": "dev",
     "require": {
-        "nategood/httpful": "*",
+        "nategood/httpful": "0.2.*",
         "vlucas/phpdotenv": "1.1.*@dev"
     },
     "require-dev": {
