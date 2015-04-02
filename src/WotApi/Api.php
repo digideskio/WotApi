@@ -125,18 +125,25 @@ class Api
      */
     public static function createUrl($name, $arguments = array())
     {
-        $api = self::$action . '/' . $name . '/';
-        $args = array('application_id' => self::$Appid);
-        foreach ($arguments as $a) {
-            $args = array_merge($args, $a);
-        }
-        if (!is_null(self::$token)) {
-            $args = array_merge($args, array('access_token' => self::$token));
+        try {
+            $api = self::$action . '/' . $name . '/';
+            $args = array('application_id' => self::$Appid);
+
+            foreach ($arguments as $a) {
+                $args = array_merge($args, $a);
+            }
+            if (!is_null(self::$token)) {
+                $args = array_merge($args, array('access_token' => self::$token));
+            }
+
+            $url = sprintf(self::$URL, self::$Region, self::$Project) . $api . '?' . http_build_query($args);
+            return $url;
+        }catch (\Exception $e)
+        {
+            self::call(self::$errorCallback, $e->getMessage(), $name, $arguments);
         }
 
-        $url = sprintf(self::$URL, self::$Region, self::$Project). $api . '?' . http_build_query($args);
 
-        return $url;
     }
 
     /**
