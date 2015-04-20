@@ -27,6 +27,7 @@ class ApiTest extends \PHPUnit_Framework_TestCase {
         Api::onSend(
             function($url, $params){
                 print PHP_EOL.'-----onSend------'.PHP_EOL;
+                var_dump(func_get_args());
             }
         );
         $this->assertNull(Api::wot()->qwe->qwe());

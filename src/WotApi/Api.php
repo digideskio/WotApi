@@ -7,6 +7,7 @@
 
 namespace WotApi;
 
+use Guzzle\Http\Client;
 use Httpful\Request;
 
 /**
@@ -93,13 +94,14 @@ class Api
      * @var string|null токен пользователя
      */
     public static $token = null;
+    private static $httpClient = null;
 
     /**
      * @var \Closure
      */
-    private static $successCallback ;
-    private static $errorCallback ;
-    private static $sendCallback ;
+    private static $successCallback;
+    private static $errorCallback;
+    private static $sendCallback;
 
 
     /**
@@ -109,6 +111,10 @@ class Api
     public static function create()
     {
         if (is_null(self::$instance)) {
+            $options = (getenv('PROXY') && getenv('PROXY_URL')) ?
+                array('defaults' => array('proxy' => getenv('PROXY_URL'))) :
+                null;
+            self::$httpClient = new Client($options);
             self::$instance = new self();
         }
 
@@ -137,9 +143,9 @@ class Api
             }
 
             $url = sprintf(self::$URL, self::$Region, self::$Project) . $api . '?' . http_build_query($args);
+
             return $url;
-        }catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             self::call(self::$errorCallback, $e->getMessage(), $name, $arguments);
         }
 
@@ -158,33 +164,22 @@ class Api
     {
         $url = self::createUrl($name, $arguments);
 
-        if (getenv('PROXY'))
-        {
-            $response = Request::get($url)
-                ->followRedirects()
-                ->addOnCurlOption(CURLOPT_PROXY, getenv('PROXY_URL'))
-                ->addOnCurlOption(CURLOPT_PROXYPORT, getenv('PROXY_PORT'))
-                ->addOnCurlOption(CURLOPT_PROXYUSERPWD, getenv('PROXY_USER'))
-                ->send();
-        }
-        else{
-            $response = Request::get($url)
-                ->followRedirects()
-                ->send();
-        }
+
+        $response = self::$httpClient->get($url, ['proxy'=>getenv('PROXY_URL')]);
         list($requestUrl) = explode('?', $url);
         self::call(self::$sendCallback, $requestUrl, $arguments);
 
-        $data = $response->body;
+        var_dump($response->getStatusCode());
+        /*@var $data Guzzle\Http\Message\Request */
+        $data = $response;
 
-        if (isset($data->status) && $data->status == 'ok')
-        {
+        if (isset($data->status) && $data->status == 'ok') {
             self::call(self::$successCallback, $data->data);
+
             return $data->data;
-        }
-        else
-        {
-            self::call(self::$errorCallback, isset($data->error)?$data->error:null);
+        } else {
+            self::call(self::$errorCallback, isset($data->error) ? $data->error : null);
+
             return null;
         }
     }
@@ -221,8 +216,7 @@ class Api
 
     public static function __callStatic($name, $arguments)
     {
-        switch(strtolower($name))
-        {
+        switch (strtolower($name)) {
             case 'blitz':
             case 'wotb':
                 self::setURL('http://api.wotblitz.%s/%s/');
@@ -241,19 +235,19 @@ class Api
         return self::create();
     }
 
-    public  static function onSuccess(\Closure $func)
+    public static function onSuccess(\Closure $func)
     {
-       self::$successCallback =  $func;
+        self::$successCallback = $func;
     }
 
-    public  static function onSend(\Closure $func)
+    public static function onSend(\Closure $func)
     {
-        self::$sendCallback =  $func;
+        self::$sendCallback = $func;
     }
 
-    public  static function onError(\Closure $func)
+    public static function onError(\Closure $func)
     {
-        self::$errorCallback =  $func;
+        self::$errorCallback = $func;
     }
 
     /**
