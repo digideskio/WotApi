@@ -8,7 +8,6 @@
 namespace WotApi;
 
 use Guzzle\Http\Client;
-use Httpful\Request;
 
 /**
  * Description of Api
@@ -165,14 +164,17 @@ class Api
         $url = self::createUrl($name, $arguments);
 
 
-        $response = self::$httpClient->get($url, ['proxy'=>getenv('PROXY_URL')]);
+        $response = self::$httpClient->get($url)->send();
         list($requestUrl) = explode('?', $url);
         self::call(self::$sendCallback, $requestUrl, $arguments);
 
-        var_dump($response->getStatusCode());
-        /*@var $data Guzzle\Http\Message\Request */
-        $data = $response;
+        if ($response->getStatusCode() > 400) {
+            self::call(self::$errorCallback, 'HTTP ERROR: Code #' . $response->getStatusCode());
+            return null;
+        }
 
+        /*@var $data Guzzle\Http\Message\Request */
+        $data = json_decode((string)$response->getBody());
         if (isset($data->status) && $data->status == 'ok') {
             self::call(self::$successCallback, $data->data);
 
