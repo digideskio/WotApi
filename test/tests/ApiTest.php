@@ -22,6 +22,7 @@ class ApiTest extends \PHPUnit_Framework_TestCase {
         Api::onSuccess(
             function($response){
                 print PHP_EOL.'-------onSuccess--------'.PHP_EOL;
+//                var_dump(func_get_args());
             }
         );
         Api::onSend(
@@ -32,6 +33,7 @@ class ApiTest extends \PHPUnit_Framework_TestCase {
         );
         $this->assertNull(Api::wot()->qwe->qwe());
         $this->assertNotNull(Api::wot()->encyclopedia->tanks());
+        $this->assertNotNull(Api::getMeta());
         $this->assertNotNull(Api::wot()->genAuthUrl());
     }
 }

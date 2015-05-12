@@ -39,7 +39,13 @@ class Api
     public static $Region = 'ru';
 
     /**
-     * @param string $Url
+     * мета-данные запроса
+     * @var
+     */
+    private static $meta;
+
+    /**
+     * @param string $URL
      */
     public static function setURL($URL)
     {
@@ -93,6 +99,10 @@ class Api
      * @var string|null токен пользователя
      */
     public static $token = null;
+
+    /*
+     * @var Guzzle\Http\Client
+     */
     private static $httpClient = null;
 
     /**
@@ -111,9 +121,9 @@ class Api
     {
         if (is_null(self::$instance)) {
             $options = (getenv('PROXY') && getenv('PROXY_URL')) ?
-                array('defaults' => array('proxy' => getenv('PROXY_URL'))) :
-                null;
-            self::$httpClient = new Client($options);
+                ['proxy' => getenv('PROXY_URL')] :
+                [];
+            self::$httpClient = new Client('',[$options]);
             self::$instance = new self();
         }
 
@@ -163,7 +173,6 @@ class Api
     {
         $url = self::createUrl($name, $arguments);
 
-
         $response = self::$httpClient->get($url)->send();
         list($requestUrl) = explode('?', $url);
         self::call(self::$sendCallback, $requestUrl, $arguments);
@@ -178,6 +187,7 @@ class Api
         if (isset($data->status) && $data->status == 'ok') {
             self::call(self::$successCallback, $data->data);
 
+            self::$meta = isset($data->meta)?$data->meta:null;
             return $data->data;
         } else {
             self::call(self::$errorCallback, isset($data->error) ? $data->error : null);
@@ -261,5 +271,10 @@ class Api
         if (is_callable($function)) {
             call_user_func_array($function, $args);
         }
+    }
+
+    public static function getMeta()
+    {
+        return self::$meta;
     }
 }
