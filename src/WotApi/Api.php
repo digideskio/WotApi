@@ -29,12 +29,12 @@ class Api
     private static $URL = 'http://api.worldoftanks.%s/%s/';
 
     /**
-     * @var string application_id приложения
+     * @var string application_id приложения - https://ru.wargaming.net/developers/applications/
      */
     public static $Appid = '';
 
     /**
-     * @var string
+     * @var string хранится проект к которому идет доступ
      */
     protected static $Project = 'wot';
 
@@ -50,15 +50,17 @@ class Api
     private static $meta;
 
     /**
-     * @param string $URL
+     * хранит сгенерированный URL для доступа к API
+     * @param string $URL Сгенерированный URL
      */
-    public static function setURL($URL)
+    private static function setURL($URL)
     {
         self::$URL = $URL;
     }
 
     /**
-     * @param string $Project
+     * Устанавливает текущий проект (WoT, Blitz, WoWp, Wgn)
+     * @param string $Project Название проекта
      */
     public static function setProject($Project)
     {
@@ -67,7 +69,8 @@ class Api
 
 
     /**
-     * @param string $Region
+     * Устанавливает регион (RU, CH......)
+     * @param string $Region название региона
      */
     public static function setRegion($Region)
     {
@@ -75,7 +78,8 @@ class Api
     }
 
     /**
-     * @param string $Appid
+     * Устанавливает application_id
+     * @param string $Appid application_id полученный https://ru.wargaming.net/developers/applications/
      */
     public static function setApplicationId($Appid)
     {
@@ -83,7 +87,8 @@ class Api
     }
 
     /**
-     * @param null|string $token
+     * Устанавливает пользовательский токен
+     * @param null|string $token токен
      */
     public static function setToken($token)
     {
@@ -105,16 +110,24 @@ class Api
      */
     private static $token = null;
 
-    /*
-     * @var Guzzle\Http\Client
+    /**
+     * @var \Guzzle\Http\Client обертка для доступа к http соединениям
      */
     private static $httpClient = null;
 
     /**
-     * @var \Closure
+     * @var \Closure Переменная для хранения Callback вызываемого при успешом получении данных
      */
     private static $successCallback;
+
+    /**
+     * @var \Closure Переменная для хранения Callback вызываемого при ошибке
+     */
     private static $errorCallback;
+
+    /**
+     * @var \Closure Переменная для хранения Callback вызываемого при отправке запроса
+     */
     private static $sendCallback;
 
 
