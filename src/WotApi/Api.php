@@ -130,6 +130,12 @@ class Api
      */
     private static $sendCallback;
 
+    /**
+     * Хранит настройки для Guzzle клиента
+     * @var array настройки для Guzzle
+     */
+    private static $options = array();
+
 
     /**
      * Создает экземпляр для доступа к API
@@ -142,6 +148,7 @@ class Api
                 ['proxy' => getenv('PROXY_URL')] :
                 [];
             self::$httpClient = new Client('', [$options]);
+            self::$options = $options;
             self::$instance = new self();
         }
 
@@ -192,7 +199,7 @@ class Api
         $url = self::createUrl($name, $arguments);
 
         try {
-            $response = self::$httpClient->get($url)->send();
+            $response = self::$httpClient->get($url, null, self::$options)->send();
         } catch (CurlException $e) {
             self::call(self::$errorCallback, $e->getMessage() . PHP_EOL . $e->getError());
         }
@@ -230,7 +237,7 @@ class Api
     public function genAuthUrl($redirect_to = '')
     {
         $redirect_to = empty($redirect_to) ? '' : $redirect_to;
-        $url = self::$instance->auth->login(array('nofollow' => 1, 'redirect_uri' => $redirect_to));
+        $url = self::create()->auth->login(array('nofollow' => 1, 'redirect_uri' => $redirect_to));
         $url = $url ? $url->location : false;
 
         return $url;
