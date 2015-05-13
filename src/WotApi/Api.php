@@ -1,16 +1,20 @@
 <?php
 /**
- * User: akeinhell
- * Date: 06.03.15
- * Time: 13:24
+ * Класс для работы с Wargaming Api
+ *
+ * Подробнее об API вы можете прочитать -
+ * @link http://ru.wargaming.net/developers/api_reference
+ * @author akeinhell (akeinhell@gmail.com)
+ *
  */
 
 namespace WotApi;
 
 use Guzzle\Http\Client;
+use Guzzle\Http\Exception\CurlException;
 
 /**
- * Description of Api
+ * Класс для работы с Wargaming Api
  *
  * @author akeinhell
  * @method static \WotApi\Api wot()
@@ -33,6 +37,7 @@ class Api
      * @var string
      */
     protected static $Project = 'wot';
+
     /**
      * @var string Регион по умолчанию
      */
@@ -98,7 +103,7 @@ class Api
     /**
      * @var string|null токен пользователя
      */
-    public static $token = null;
+    private static $token = null;
 
     /*
      * @var Guzzle\Http\Client
@@ -123,7 +128,7 @@ class Api
             $options = (getenv('PROXY') && getenv('PROXY_URL')) ?
                 ['proxy' => getenv('PROXY_URL')] :
                 [];
-            self::$httpClient = new Client('',[$options]);
+            self::$httpClient = new Client('', [$options]);
             self::$instance = new self();
         }
 
@@ -138,7 +143,7 @@ class Api
      *
      * @return string
      */
-    public static function createUrl($name, $arguments = array())
+    private static function createUrl($name, $arguments = array())
     {
         try {
             $api = self::$action . '/' . $name . '/';
@@ -173,12 +178,17 @@ class Api
     {
         $url = self::createUrl($name, $arguments);
 
-        $response = self::$httpClient->get($url)->send();
+        try {
+            $response = self::$httpClient->get($url)->send();
+        } catch (CurlException $e) {
+            self::call(self::$errorCallback, $e->getMessage() . PHP_EOL . $e->getError());
+        }
         list($requestUrl) = explode('?', $url);
         self::call(self::$sendCallback, $requestUrl, $arguments);
 
         if ($response->getStatusCode() > 400) {
             self::call(self::$errorCallback, 'HTTP ERROR: Code #' . $response->getStatusCode());
+
             return null;
         }
 
@@ -187,7 +197,8 @@ class Api
         if (isset($data->status) && $data->status == 'ok') {
             self::call(self::$successCallback, $data->data);
 
-            self::$meta = isset($data->meta)?$data->meta:null;
+            self::$meta = isset($data->meta) ? $data->meta : null;
+
             return $data->data;
         } else {
             self::call(self::$errorCallback, isset($data->error) ? $data->error : null);
@@ -199,7 +210,7 @@ class Api
     /**
      * Генерирует ссылку для авторизации через OpenId
      *
-     * @param string $redirect_to
+     * @param string $redirect_to редиректит на указанную страницу после авторизации
      *
      * @return null
      */
@@ -214,6 +225,7 @@ class Api
 
     /**
      * Тут творится магия :-)
+     * Назначение первого параметра в API запросе
      *
      * @param $name
      *
@@ -226,6 +238,15 @@ class Api
         return self::create();
     }
 
+
+    /**
+     * Выбор проекта для получения API
+     *
+     * @param $name
+     * @param $arguments
+     *
+     * @return \WotApi\Api
+     */
     public static function __callStatic($name, $arguments)
     {
         switch (strtolower($name)) {
@@ -247,22 +268,38 @@ class Api
         return self::create();
     }
 
+    /**
+     * Callback при удачном получении данных
+     *
+     * @param callable $func
+     */
     public static function onSuccess(\Closure $func)
     {
         self::$successCallback = $func;
     }
 
+    /**
+     * Callback при отправке
+     *
+     * @param callable $func
+     */
     public static function onSend(\Closure $func)
     {
         self::$sendCallback = $func;
     }
 
+    /**
+     * Callback при ошибке
+     *
+     * @param callable $func
+     */
     public static function onError(\Closure $func)
     {
         self::$errorCallback = $func;
     }
 
     /**
+     * Запускает нужный Callback с параметрами
      */
     private static function call()
     {
@@ -273,6 +310,11 @@ class Api
         }
     }
 
+    /**
+     * Получение мета данных запроса
+     * Вызывается после получения данных
+     * @return mixed
+     */
     public static function getMeta()
     {
         return self::$meta;
