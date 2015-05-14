@@ -78,12 +78,46 @@ class Api
     }
 
     /**
+     * @return null|string
+     */
+    public static function getToken()
+    {
+        return self::$token;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getRegion()
+    {
+        return self::$Region;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getProject()
+    {
+        return self::$Project;
+    }
+
+
+    /**
      * Устанавливает application_id
      * @param string $Appid application_id полученный https://ru.wargaming.net/developers/applications/
      */
     public static function setApplicationId($Appid)
     {
         self::$Appid = $Appid;
+    }
+
+    /**
+     * Получает значение application_id
+     * @return string
+     */
+    public static function getApplicationId()
+    {
+        return self::$Appid;
     }
 
     /**
