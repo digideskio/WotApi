@@ -18,7 +18,7 @@ class ApiTest extends \PHPUnit_Framework_TestCase
         $error = $success = $send = false;
         Api::onError(function ($message) use (&$error) {
                 $error = true;
-//                var_dump($message);
+                var_dump($message);
             }
         );
         Api::onSuccess(
@@ -27,8 +27,9 @@ class ApiTest extends \PHPUnit_Framework_TestCase
             }
         );
         Api::onSend(
-            function () use (&$send) {
+            function ($url) use (&$send) {
                 $send = true;
+                printf('fetch [%s]' . PHP_EOL, $url);
             }
         );
 

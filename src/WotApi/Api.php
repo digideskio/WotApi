@@ -3,7 +3,7 @@
  * Класс для работы с Wargaming Api
  *
  * Подробнее об API вы можете прочитать -
- * @link http://ru.wargaming.net/developers/api_reference
+ * @link   http://ru.wargaming.net/developers/api_reference
  * @author akeinhell (akeinhell@gmail.com)
  *
  */
@@ -51,6 +51,7 @@ class Api
 
     /**
      * хранит сгенерированный URL для доступа к API
+     *
      * @param string $URL Сгенерированный URL
      */
     private static function setURL($URL)
@@ -60,6 +61,7 @@ class Api
 
     /**
      * Устанавливает текущий проект (WoT, Blitz, WoWp, Wgn)
+     *
      * @param string $Project Название проекта
      */
     public static function setProject($Project)
@@ -70,6 +72,7 @@ class Api
 
     /**
      * Устанавливает регион (RU, CH......)
+     *
      * @param string $Region название региона
      */
     public static function setRegion($Region)
@@ -104,6 +107,7 @@ class Api
 
     /**
      * Устанавливает application_id
+     *
      * @param string $Appid application_id полученный https://ru.wargaming.net/developers/applications/
      */
     public static function setApplicationId($Appid)
@@ -122,6 +126,7 @@ class Api
 
     /**
      * Устанавливает пользовательский токен
+     *
      * @param null|string $token токен
      */
     public static function setToken($token)
@@ -215,9 +220,38 @@ class Api
             return $url;
         } catch (\Exception $e) {
             self::call(self::$errorCallback, $e->getMessage(), $name, $arguments);
+
+            return null;
         }
 
+    }
 
+    private static function _get($url, $retryCount = 3)
+    {
+        try {
+            $response = self::$httpClient->get($url, null, self::$options)->send();
+
+            list($requestUrl, $arguments) = explode('?', $url);
+            self::call(self::$sendCallback, $requestUrl, explode('&', $arguments));
+
+            if ($response->getStatusCode() > 400) {
+                if ($retryCount > 0) {
+                    return self::_get($url, $retryCount - 1);
+                } else {
+                    self::call(self::$errorCallback, 'HTTP ERROR: Code #' . $response->getStatusCode());
+
+                    return null;
+                }
+
+            }
+
+            return json_decode((string)$response->getBody());
+
+        } catch (CurlException $e) {
+            self::call(self::$errorCallback, $e->getMessage() . PHP_EOL . $e->getError());
+
+            return null;
+        }
     }
 
     /**
@@ -232,22 +266,8 @@ class Api
     {
         $url = self::createUrl($name, $arguments);
 
-        try {
-            $response = self::$httpClient->get($url, null, self::$options)->send();
-        } catch (CurlException $e) {
-            self::call(self::$errorCallback, $e->getMessage() . PHP_EOL . $e->getError());
-        }
-        list($requestUrl) = explode('?', $url);
-        self::call(self::$sendCallback, $requestUrl, $arguments);
 
-        if ($response->getStatusCode() > 400) {
-            self::call(self::$errorCallback, 'HTTP ERROR: Code #' . $response->getStatusCode());
-
-            return null;
-        }
-
-        /*@var $data Guzzle\Http\Message\Request */
-        $data = json_decode((string)$response->getBody());
+        $data = self::_get($url);
         if (isset($data->status) && $data->status == 'ok') {
             self::call(self::$successCallback, $data->data);
 
@@ -259,6 +279,7 @@ class Api
 
             return null;
         }
+
     }
 
     /**
