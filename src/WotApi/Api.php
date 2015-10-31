@@ -1,16 +1,20 @@
 <?php
 /**
- * User: akeinhell
- * Date: 06.03.15
- * Time: 13:24
+ * Класс для работы с Wargaming Api
+ *
+ * Подробнее об API вы можете прочитать -
+ * @link   http://ru.wargaming.net/developers/api_reference
+ * @author akeinhell (akeinhell@gmail.com)
+ *
  */
 
 namespace WotApi;
 
 use Guzzle\Http\Client;
+use Guzzle\Http\Exception\CurlException;
 
 /**
- * Description of Api
+ * Класс для работы с Wargaming Api
  *
  * @author akeinhell
  * @method static \WotApi\Api wot()
@@ -25,29 +29,40 @@ class Api
     private static $URL = 'http://api.worldoftanks.%s/%s/';
 
     /**
-     * @var string application_id приложения
+     * @var string application_id приложения - https://ru.wargaming.net/developers/applications/
      */
     public static $Appid = '';
 
     /**
-     * @var string
+     * @var string хранится проект к которому идет доступ
      */
     protected static $Project = 'wot';
+
     /**
      * @var string Регион по умолчанию
      */
     public static $Region = 'ru';
 
     /**
-     * @param string $Url
+     * мета-данные запроса
+     * @var
      */
-    public static function setURL($URL)
+    private static $meta;
+
+    /**
+     * хранит сгенерированный URL для доступа к API
+     *
+     * @param string $URL Сгенерированный URL
+     */
+    private static function setURL($URL)
     {
         self::$URL = $URL;
     }
 
     /**
-     * @param string $Project
+     * Устанавливает текущий проект (WoT, Blitz, WoWp, Wgn)
+     *
+     * @param string $Project Название проекта
      */
     public static function setProject($Project)
     {
@@ -56,7 +71,9 @@ class Api
 
 
     /**
-     * @param string $Region
+     * Устанавливает регион (RU, CH......)
+     *
+     * @param string $Region название региона
      */
     public static function setRegion($Region)
     {
@@ -64,7 +81,34 @@ class Api
     }
 
     /**
-     * @param string $Appid
+     * @return null|string
+     */
+    public static function getToken()
+    {
+        return self::$token;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getRegion()
+    {
+        return self::$Region;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getProject()
+    {
+        return self::$Project;
+    }
+
+
+    /**
+     * Устанавливает application_id
+     *
+     * @param string $Appid application_id полученный https://ru.wargaming.net/developers/applications/
      */
     public static function setApplicationId($Appid)
     {
@@ -72,7 +116,18 @@ class Api
     }
 
     /**
-     * @param null|string $token
+     * Получает значение application_id
+     * @return string
+     */
+    public static function getApplicationId()
+    {
+        return self::$Appid;
+    }
+
+    /**
+     * Устанавливает пользовательский токен
+     *
+     * @param null|string $token токен
      */
     public static function setToken($token)
     {
@@ -92,15 +147,33 @@ class Api
     /**
      * @var string|null токен пользователя
      */
-    public static $token = null;
+    private static $token = null;
+
+    /**
+     * @var \Guzzle\Http\Client обертка для доступа к http соединениям
+     */
     private static $httpClient = null;
 
     /**
-     * @var \Closure
+     * @var \Closure Переменная для хранения Callback вызываемого при успешом получении данных
      */
     private static $successCallback;
+
+    /**
+     * @var \Closure Переменная для хранения Callback вызываемого при ошибке
+     */
     private static $errorCallback;
+
+    /**
+     * @var \Closure Переменная для хранения Callback вызываемого при отправке запроса
+     */
     private static $sendCallback;
+
+    /**
+     * Хранит настройки для Guzzle клиента
+     * @var array настройки для Guzzle
+     */
+    private static $options = array();
 
 
     /**
@@ -111,9 +184,10 @@ class Api
     {
         if (is_null(self::$instance)) {
             $options = (getenv('PROXY') && getenv('PROXY_URL')) ?
-                array('defaults' => array('proxy' => getenv('PROXY_URL'))) :
-                null;
-            self::$httpClient = new Client($options);
+                ['proxy' => getenv('PROXY_URL')] :
+                [];
+            self::$httpClient = new Client('', [$options]);
+            self::$options = $options;
             self::$instance = new self();
         }
 
@@ -128,7 +202,7 @@ class Api
      *
      * @return string
      */
-    public static function createUrl($name, $arguments = array())
+    private static function createUrl($name, $arguments = array())
     {
         try {
             $api = self::$action . '/' . $name . '/';
@@ -146,9 +220,38 @@ class Api
             return $url;
         } catch (\Exception $e) {
             self::call(self::$errorCallback, $e->getMessage(), $name, $arguments);
+
+            return null;
         }
 
+    }
 
+    private static function _get($url, $retryCount = 3)
+    {
+        try {
+            $response = self::$httpClient->get($url, null, self::$options)->send();
+
+            list($requestUrl, $arguments) = explode('?', $url);
+            self::call(self::$sendCallback, $requestUrl, explode('&', $arguments));
+
+            if ($response->getStatusCode() > 400) {
+                if ($retryCount > 0) {
+                    return self::_get($url, $retryCount - 1);
+                } else {
+                    self::call(self::$errorCallback, 'HTTP ERROR: Code #' . $response->getStatusCode());
+
+                    return null;
+                }
+
+            }
+
+            return json_decode((string)$response->getBody());
+
+        } catch (CurlException $e) {
+            self::call(self::$errorCallback, $e->getMessage() . PHP_EOL . $e->getError());
+
+            return null;
+        }
     }
 
     /**
@@ -164,19 +267,11 @@ class Api
         $url = self::createUrl($name, $arguments);
 
 
-        $response = self::$httpClient->get($url)->send();
-        list($requestUrl) = explode('?', $url);
-        self::call(self::$sendCallback, $requestUrl, $arguments);
-
-        if ($response->getStatusCode() > 400) {
-            self::call(self::$errorCallback, 'HTTP ERROR: Code #' . $response->getStatusCode());
-            return null;
-        }
-
-        /*@var $data Guzzle\Http\Message\Request */
-        $data = json_decode((string)$response->getBody());
+        $data = self::_get($url);
         if (isset($data->status) && $data->status == 'ok') {
             self::call(self::$successCallback, $data->data);
+
+            self::$meta = isset($data->meta) ? $data->meta : null;
 
             return $data->data;
         } else {
@@ -184,19 +279,20 @@ class Api
 
             return null;
         }
+
     }
 
     /**
      * Генерирует ссылку для авторизации через OpenId
      *
-     * @param string $redirect_to
+     * @param string $redirect_to редиректит на указанную страницу после авторизации
      *
      * @return null
      */
     public function genAuthUrl($redirect_to = '')
     {
         $redirect_to = empty($redirect_to) ? '' : $redirect_to;
-        $url = self::$instance->auth->login(array('nofollow' => 1, 'redirect_uri' => $redirect_to));
+        $url = self::create()->auth->login(array('nofollow' => 1, 'redirect_uri' => $redirect_to));
         $url = $url ? $url->location : false;
 
         return $url;
@@ -204,6 +300,7 @@ class Api
 
     /**
      * Тут творится магия :-)
+     * Назначение первого параметра в API запросе
      *
      * @param $name
      *
@@ -216,6 +313,15 @@ class Api
         return self::create();
     }
 
+
+    /**
+     * Выбор проекта для получения API
+     *
+     * @param $name
+     * @param $arguments
+     *
+     * @return \WotApi\Api
+     */
     public static function __callStatic($name, $arguments)
     {
         switch (strtolower($name)) {
@@ -237,22 +343,38 @@ class Api
         return self::create();
     }
 
+    /**
+     * Callback при удачном получении данных
+     *
+     * @param callable $func
+     */
     public static function onSuccess(\Closure $func)
     {
         self::$successCallback = $func;
     }
 
+    /**
+     * Callback при отправке
+     *
+     * @param callable $func
+     */
     public static function onSend(\Closure $func)
     {
         self::$sendCallback = $func;
     }
 
+    /**
+     * Callback при ошибке
+     *
+     * @param callable $func
+     */
     public static function onError(\Closure $func)
     {
         self::$errorCallback = $func;
     }
 
     /**
+     * Запускает нужный Callback с параметрами
      */
     private static function call()
     {
@@ -261,5 +383,15 @@ class Api
         if (is_callable($function)) {
             call_user_func_array($function, $args);
         }
+    }
+
+    /**
+     * Получение мета данных запроса
+     * Вызывается после получения данных
+     * @return mixed
+     */
+    public static function getMeta()
+    {
+        return self::$meta;
     }
 }
